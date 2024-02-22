@@ -2,14 +2,15 @@ import pandas as pd
 from flask import Flask, render_template
 from flask import jsonify
 
-
 app = Flask("Website")
 
+stations = pd.read_csv("data_small/stations.txt", skiprows=17)
+stations = stations[["STAID", "STANAME                                 "]]
 
 @app.route("/")
 def home():
     """if we put template in tutorials folder we don't write path"""
-    return render_template("home.html")
+    return render_template("home.html", data=stations.to_html())
 
 
 @app.route("/api/v1/<station>/<date>")
