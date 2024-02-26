@@ -7,6 +7,7 @@ app = Flask("Website")
 stations = pd.read_csv("data_small/stations.txt", skiprows=17)
 stations = stations[["STAID", "STANAME                                 "]]
 
+
 @app.route("/")
 def home():
     """if we put template in tutorials folder we don't write path"""
@@ -44,5 +45,24 @@ def about(station, date):
     # Convert the result to JSON and return
     return jsonify(weather_result)
 
+
+@app.route("/api/v1/<station>")
+def all_data(station):
+    # Construct the file path
+    filename = "data_small/TG_STAID" + str(station).zfill(6) + ".txt"
+    # Read the CSV file, considering the specific structure of your file
+    df = pd.read_csv(filename, skiprows=20, parse_dates=["    DATE"], sep=",", engine="python", skipfooter=1)
+    result = df.to_dict(orient="records")
+    return result
+
+@app.route("/api/v1/yearly/<station>/<year>")
+def yearly(station, year):
+    # Construct the file path
+    filename = "data_small/TG_STAID" + str(station).zfill(6) + ".txt"
+    # Read the CSV file, considering the specific structure of your file
+    df = pd.read_csv(filename, skiprows=20)
+    df["    DATE"] = df["    DATE"].astype(str)
+    result = df[df["    DATE"].str.startswith(str(year))].to_dict(orient="records")
+    return result
 
 app.run(debug=True)
